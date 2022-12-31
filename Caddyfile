@@ -10,9 +10,11 @@
   # Use the ACME HTTP-01 challenge to get a cert for the configured domain.
   tls {$EMAIL}
 
-  redir {$SUBPATH} {$SUBPATH}/ permanent
+  # use this directive if not hosting at subpath
+  # reverse_proxy joplin:22300
 
-  handle {$SUBPATH}/* {
+  redir {$SUBPATH} {$SUBPATH}/ permanent
+  handle_path {$SUBPATH}/* {
     reverse_proxy joplin:22300
   }
 

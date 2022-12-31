@@ -4,8 +4,6 @@ for dir in 'caddy-data' 'caddy-config'; do
     mkdir -p data/"$dir"
 done
 
-export SUBPATH=
+export SUBPATH='/example-subpath' # must start with '/'
 
 docker compose up -d
-
-echo "Vaultwarden instance started!"
