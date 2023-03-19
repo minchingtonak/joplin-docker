@@ -12,6 +12,30 @@ services:
     environment:
       - APP_BASE_URL= # full url, ending with ${SUBPATH} if using subpath
       - APP_PORT=22300
+      - DB_CLIENT=pg
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DATABASE=joplin
+      - POSTGRES_USER=joplin
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - caddy-joplin
+      - joplin-db
+
+  db:
+    image: postgres:15
+    container_name: db
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=joplin
+      - POSTGRES_USER=joplin
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - joplin-db
 
   caddy:
     image: caddy:2
@@ -30,3 +54,9 @@ services:
       - EMAIL= # The email address to use for ACME registration
       - SUBPATH=${SUBPATH}
       - LOG_FILE=/data/caddy.log
+    networks:
+      - caddy-joplin
+
+networks:
+  caddy-joplin:
+  joplin-db:
