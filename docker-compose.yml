@@ -5,19 +5,19 @@ services:
   joplin:
     image: joplin/server:latest
     container_name: joplin
+    restart: unless-stopped
     # https://askubuntu.com/questions/652556/uncomplicated-firewall-ufw-is-not-blocking-anything-when-using-docker
     ports:
-      - 127.0.0.1:22300:22300
-    restart: unless-stopped
+      - '127.0.0.1:22300:22300'
     environment:
-      - APP_BASE_URL= # full url, ending with ${SUBPATH} if using subpath
-      - APP_PORT=22300
-      - DB_CLIENT=pg
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
-      - POSTGRES_DATABASE=joplin
-      - POSTGRES_USER=joplin
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      APP_BASE_URL: http://localhost:8888${SUBPATH} # full url, ending with ${SUBPATH} if using subpath
+      APP_PORT: 22300
+      DB_CLIENT: pg
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: joplin
+      POSTGRES_USER: joplin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
       - caddy-joplin
       - joplin-db
@@ -27,33 +27,34 @@ services:
     container_name: db
     restart: unless-stopped
     ports:
-      - 127.0.0.1:5432:5432
+      - '127.0.0.1:5432:5432'
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=joplin
-      - POSTGRES_USER=joplin
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      POSTGRES_DB: joplin
+      POSTGRES_USER: joplin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
       - joplin-db
 
   caddy:
     image: caddy:2
     container_name: caddy
-    restart: always
+    restart: unless-stopped
     ports:
-      - 80:80 # Needed for the ACME HTTP-01 challenge.
-      - 443:443
+      # - '80:80' # Needed for the ACME HTTP-01 challenge.
+      # - '443:443'
+      - '8888:8888'
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./data/caddy-config:/config
       - ./data/caddy-data:/data
       - ./logrotate/caddy:/etc/logrotate.d/caddy:ro
     environment:
-      - DOMAIN= # domain must not end with '/'
-      - EMAIL= # The email address to use for ACME registration
-      - SUBPATH=${SUBPATH}
-      - LOG_FILE=/data/caddy.log
+      DOMAIN: http://localhost # domain must not end with '/'
+      EMAIL: akmin@localhost # The email address to use for ACME registration
+      SUBPATH: ${SUBPATH}
+      LOG_FILE: /data/caddy.log
     networks:
       - caddy-joplin
 

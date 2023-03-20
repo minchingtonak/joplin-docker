@@ -1,4 +1,4 @@
-{$DOMAIN}:443 {
+{$DOMAIN}:8888 {
   log {
     level INFO
     output file {$LOG_FILE} {
@@ -8,7 +8,7 @@
   }
 
   # Use the ACME HTTP-01 challenge to get a cert for the configured domain.
-  tls {$EMAIL}
+  # tls {$EMAIL}
 
   # use this directive if not hosting at subpath
   # reverse_proxy joplin:22300
